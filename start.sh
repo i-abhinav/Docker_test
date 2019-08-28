@@ -7,70 +7,32 @@ blue=$'\e[1;34m'
 white=$'\e[0m'
 
 
+sudo apt update
+sudo apt install -y curl
+
 echo " $red ----- Installing Pre requisites ------- $white "
 sudo docker-compose down && docker-compose up --build -d
 
-fresh_container() {
-  [ ! -f $INIT_SEM ]
-}
-
-app_present() {
-  [ -f /app/config/database.php ]
-}
+echo " $grn -------Installing Dependencies -----------$blu "
+sudo sleep 200s #this line is included for composer to finish the dependency installation so that test case can execute without error.
 
 vendor_present() {
-  [ -f /app/vendor ]
+  [ -f /var/www/myorder/vendor ]
 }
 
-wait_for_db() {
-  local db_host="${DB_HOST:-mariadb}"
-  local db_port="${DB_PORT:-3306}"
-  local db_address=$(getent hosts "$db_host" | awk '{ print $1 }')
-  counter=0
-  log "Connecting to mariadb at $db_address"
-  while ! curl --silent "$db_address:$db_port" >/dev/null; do
-    counter=$((counter+1))
-    if [ $counter == 30 ]; then
-      log "Error: Couldn't connect to mariadb."
-      exit 1
-    fi
-    log "Trying to connect to mariadb at $db_address. Attempt $counter."
-    sleep 5
-  done
-}
-
-setup_db() {
-  log "Configuring the database"
-  sed -i "s/utf8mb4/utf8/g" /app/config/database.php
-  php artisan migrate --force
-}
-
-
-  log "Installing/Updating Lumen dependencies (composer)"
+  echo "Installing/Updating Lumen dependencies (composer)"
   if ! vendor_present; then
     composer install
-    log "Dependencies installed"
+    echo "Dependencies installed"
   else
     composer update
-    log "Dependencies updated"
+    echo "Dependencies updated"
   fi
 
-  wait_for_db
+echo " $red ----- Running Migrations & Data Seeding ------- $white "
+docker exec ${APP_NAME}_php php artisan key:generate
+docker exec ${APP_NAME}_php php artisan migrate
+# docker exec ${APP_NAME}_php php artisan db:seed
 
-  if ! fresh_container; then
-    echo "#########################################################################"
-    echo "                                                                         "
-    echo " App initialization skipped:                                             "
-    echo " Delete the file $INIT_SEM and restart the container to reinitialize     "
-    echo " You can alternatively run specific commands using docker-compose exec   "
-    echo " e.g docker-compose exec myapp php artisan make:console FooCommand       "
-    echo "                                                                         "
-    echo "#########################################################################"
-  else
-    setup_db
-    log "Initialization finished"
-    touch $INIT_SEM
-  fi
-fi
 
-exec tini -- "$@"
+exit 0
