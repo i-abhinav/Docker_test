@@ -1,0 +1,136 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "MyOrder API",
+        "description": "MyOrder API",
+        "contact": {
+            "name": "ABhinav Gupta",
+            "email": "abhinav.gupta02@nagarro.com"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/orders": {
+            "get": {
+                "tags": [
+                    "Order List"
+                ],
+                "summary": "Return Order List",
+                "description": "Returns Order id, status, disatnce List",
+                "operationId": "getOrderList",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Create New Order"
+                ],
+                "summary": "Place an order",
+                "description": "Create a new Order after valid request of Geo-coordinates",
+                "operationId": "placeOrder",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "origin": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "destination": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object",
+                                "example": {
+                                    "origin": [
+                                        "10",
+                                        "80"
+                                    ],
+                                    "destination": [
+                                        "83.232",
+                                        "145.3487"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "successful operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "422": {
+                        "description": "Invalid Parameters"
+                    }
+                }
+            }
+        },
+        "/orders/{orderID}": {
+            "patch": {
+                "tags": [
+                    "Take a Order"
+                ],
+                "summary": "Take a order",
+                "description": "Take order by Order Id where Order status is UNASSIGNED",
+                "operationId": "takeOrder",
+                "parameters": [
+                    {
+                        "name": "orderID",
+                        "in": "path",
+                        "description": "Valid Order Id",
+                        "required": true,
+                        "style": "form",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object",
+                                "example": {
+                                    "status": "TAKEN"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Order successfully Taken"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "409": {
+                        "description": "Conflict Order/Already Taken"
+                    },
+                    "422": {
+                        "description": "Invalid Parameters"
+                    }
+                }
+            }
+        }
+    }
+}

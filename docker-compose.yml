@@ -1,0 +1,43 @@
+version: "3"
+        
+services:  
+    # nginx
+    nginx:
+        container_name: ${APP_NAME}_nginx
+        build: ./docker-assets/nginx
+        volumes:
+            - ./:/var/www/myorder
+            - ./docker-assets/nginx/conf.d:/etc/nginx/conf.d
+        links:
+            - php-fpm
+        ports:
+            - 8080:8080
+        working_dir: /var/www/myorder
+       
+    # php
+    php-fpm:
+        container_name: ${APP_NAME}_php-fpm
+        build: ./docker-assets/php
+        links:
+            - mysql
+        volumes:
+            - ./:/var/www/myorder
+        depends_on:
+            - mysql
+        working_dir: /var/www/myorder
+        
+    # database
+    mysql:
+        container_name: ${APP_NAME}_mysql
+        image: mysql
+        volumes: 
+            - ./database:/var/lib/mysql
+        ports:
+            - 3306:3306
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
