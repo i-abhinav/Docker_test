@@ -7,11 +7,8 @@ blue=$'\e[1;34m'
 white=$'\e[0m'
 
 
-sudo apt update
-sudo apt install -y curl
-
-echo " $red ----- Installing Pre requisites ------- $white "
-sudo docker-compose down && docker-compose up --build -d
+echo " $red ----- Setting up Docker Environment ------- $white "
+docker-compose down && docker-compose up --build -d
 
 echo " $grn -------Installing Dependencies -----------$blu "
 sudo sleep 200s #this line is included for composer to finish the dependency installation so that test case can execute without error.
