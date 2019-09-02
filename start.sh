@@ -6,6 +6,7 @@ green=$'\e[1;32m'
 blue=$'\e[1;34m'
 white=$'\e[0m'
 
+source .env
 
 echo " $red <<<<<< Setting up Docker Environment >>>>>> $white "
 docker-compose down && docker-compose up --build -d
