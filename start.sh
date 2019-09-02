@@ -26,6 +26,12 @@ vendor_present() {
     echo "Dependencies updated"
   fi
 
+docker exec ${APP_NAME}_php bash -c 'chmod 777 -R /var/www/html'
+
+docker exec ${APP_NAME}_php php artisan config:cache
+
+docker exec ${APP_NAME}_php php artisan optimize:clear
+
 echo " $red <<<<<< Running Migrations & Data Seeding >>>>>> $white "
 docker exec ${APP_NAME}_php php artisan key:generate
 docker exec ${APP_NAME}_php php artisan migrate
@@ -36,6 +42,6 @@ echo " $red <<<<<< Running PHP in-built server >>>>>> $white "
 docker exec ${APP_NAME}_php php -S localhot:8080 -t public
 
 echo " $red <<<<<< Running PHPUnit Test >>>>>> $white "
-docker exec ${APP_NAME}_php vendor\bin\phpunit
+docker exec ${APP_NAME}_php ./vendor/bin/phpunit
 
 exit 0
