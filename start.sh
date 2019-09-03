@@ -17,7 +17,7 @@ echo " $grn <<<<<< Installing Dependencies >>>>>> $blu "
 
 vendor_present() {
   #[ -d /var/www/html/"${PWD##*/}"/vendor ]
-  [ -d vendor]
+   [ -d vendor ]
 }
 
   echo " $red <<<<<< Installing/Updating Lumen dependencies (composer) >>>>>> $white "
