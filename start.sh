@@ -32,7 +32,7 @@ vendor_present() {
 
 # docker exec ${APP_NAME}_php bash -c 'chmod 777 -R /var/www/html'
 # docker exec ${APP_NAME}_php bash -c 'chmod 777 -R storage'
-docker exec -it ${APP_NAME}_app bash -c "sudo -u devuser /bin/bash"
+docker exec -it myorders_app bash -c "sudo -u devuser /bin/bash"
 
 # docker exec ${APP_NAME}_php php artisan config:cache
 php artisan config:cache

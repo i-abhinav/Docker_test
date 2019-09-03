@@ -48,7 +48,7 @@
 version: '3.5'
 
 services:
-  ${APP_NAME}_app:
+  myorders_app:
     build:
       context: './docker-assets/apache'
       args:
