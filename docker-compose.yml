@@ -45,38 +45,44 @@
 
 
 
-version: "3"
+version: '3.5'
+
 services:
-  php:
-    container_name: ${APP_NAME}_php
-    build: ./docker-assets-new/php
-    # networks:
-    #   - backend
-    volumes:
-        - ./:/var/www/html/
-  apache:
-    container_name: ${APP_NAME}_apache
-    build: './docker-assets-new/apache/'
-    depends_on:
-      - php
-      - mysql
-    # networks:
-    #   - frontend
-    #   - backend
-    ports:
-      - "8080:80"
-    volumes:
-      - ./:/var/www/html/
-  mysql:
-    container_name: ${APP_NAME}_mysql
-    image: mysql
-    # networks:
-    #   - backend
+  ${APP_NAME}_app:
+    build:
+      context: './docker-assets/apache'
+      args:
+        uid: ${UID}
+    container_name: ${APP_NAME}_app
     environment:
-        MYSQL_ROOT_PASSWORD : ${MYSQL_ROOT_PASSWORD}
-        MYSQL_DATABASE : ${DB_DATABASE}
-        MYSQL_USER : ${DB_USERNAME}
-        MYSQL_PASSWORD : ${DB_PASSWORD}
-# networks:
-#   frontend:
-#   backend:
+      - APACHE_RUN_USER=#${UID}
+      - APACHE_RUN_GROUP=#${UID}
+    volumes:
+      - .:/var/www/html
+    ports:
+      - 8000:80
+    networks:
+      backend:
+        aliases:
+          - ${APP_NAME}_app
+
+  mysql-db:
+    image: mysql
+    container_name: ${APP_NAME}_mysql_db
+    volumes:
+      - ./run/var:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${DB_DATABASE}
+        MYSQL_USER: ${DB_USERNAME}
+        MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks:
+      backend:
+        aliases:
+          - db
+
+networks:
+  backend:
+    name: backend-network
