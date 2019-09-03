@@ -50,8 +50,8 @@ services:
   php:
     container_name: ${APP_NAME}_php
     build: ./docker-assets-new/php
-    networks:
-      -  ${APP_NAME}_backend
+    # networks:
+    #   - backend
     volumes:
         - ./:/var/www/html/
   apache:
@@ -60,9 +60,9 @@ services:
     depends_on:
       - php
       - mysql
-    networks:
-      -  ${APP_NAME}_frontend
-      -  ${APP_NAME}_backend
+    # networks:
+    #   - frontend
+    #   - backend
     ports:
       - "8080:80"
     volumes:
@@ -70,13 +70,13 @@ services:
   mysql:
     container_name: ${APP_NAME}_mysql
     image: mysql
-    networks:
-      -  ${APP_NAME}_backend
+    # networks:
+    #   - backend
     environment:
         MYSQL_ROOT_PASSWORD : ${MYSQL_ROOT_PASSWORD}
         MYSQL_DATABASE : ${DB_DATABASE}
         MYSQL_USER : ${DB_USERNAME}
         MYSQL_PASSWORD : ${DB_PASSWORD}
-networks:
-   ${APP_NAME}_frontend:
-   ${APP_NAME}_backend:
+# networks:
+#   frontend:
+#   backend:
