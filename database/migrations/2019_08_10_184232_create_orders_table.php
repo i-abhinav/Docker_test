@@ -15,12 +15,12 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->bigIncrements('id')->autoIncrement();
-            $table->uuid('order_id')->unique();;
+            $table->char('order_id', 20)->unique();;
             $table->float('origin_lat', 10, 6);
             $table->float('origin_lng', 10, 6);
             $table->float('destination_lat', 10, 6);
             $table->float('destination_lng', 10, 6);
-            $table->double('distance', 10, 6);
+            $table->double('distance', 10, 2);
             $table->char('status', 10);
             $table->dateTime('created_at');
             $table->dateTime('updated_at');

@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
+    const STATUS_UNASSIGNED = 'UNASSIGNED';
+    const STATUS_ASSIGNED = 'TAKEN';
+
+    protected $table = 'orders';
 
     /**
      * The attributes that are mass assignable.
@@ -13,15 +17,8 @@ class Order extends Model
      * @var array
      */
     protected $fillable = [
-        'order_id', 'status',
+        'order_id', 'status', 'origin_lat', 'origin_lng', 'destination_lat', 'destination_lng', 'distance' 
     ];
 
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-    ];
+    
 }

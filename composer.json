@@ -27,7 +27,8 @@
     },
     "autoload-dev": {
         "classmap": [
-            "tests/"
+            "tests/",
+            "app/Repositories"
         ]
     },
     "scripts": {

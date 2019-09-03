@@ -66,6 +66,10 @@ class Handler extends ExceptionHandler
         {
             return response()->json(['error'=>$exception->getMessage()], 500);
         }
+        if($exception)
+        {
+            return $this->_customApiResponse($exception);
+        }
         return parent::render($request, $exception);
 
     }
@@ -83,32 +87,37 @@ class Handler extends ExceptionHandler
 
         switch ($statusCode) {
             case 401:
-                $response['message'] = 'Unauthorized';
+                $response['error'] = 'Unauthorized';
                 break;
             case 403:
-                $response['message'] = 'Forbidden';
+                $response['error'] = 'Forbidden';
                 break;
             case 404:
-                $response['message'] = 'Not Found';
+                $response['error'] = 'Not Found';
                 break;
             case 405:
-                $response['message'] = 'Method Not Allowed';
+                $response['error'] = 'Method Not Allowed';
                 break;
             case 422:
-                $response['message'] = $exception->original['message'];
+                $response['error'] = $exception->original['message'];
                 $response['errors'] = $exception->original['errors'];
                 break;
+            case 301:
+                $response['error'] = "Invalid API Reuquest";
             default:
-                $response['message'] = ($statusCode == 500) ? 'Whoops, looks like something went wrong' : $exception->getMessage();
+            dd($exception);
+                $response['error'] = ($statusCode == 500) ? 'Whoops, looks like something went wrong' : $exception->getMessage();
                 break;
         }
 
+        /*      
         if (config('app.debug')) {
             $response['trace'] = $exception->getTrace();
             $response['code'] = $exception->getCode();
         }
 
         $response['status'] = $statusCode;
+         */
 
         return response()->json($response, $statusCode);
     }

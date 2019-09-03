@@ -5,11 +5,9 @@ use Illuminate\Http\Request;
 
 use App\Models\Order;
 use App\Helpers\Haversine;
-use App\Http\Validations\OrderValidation;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Validator;
-use GuzzleHttp\Exception\RequestException;
-
+use App\Helpers\GoogleDistanceMatrix;
+use App\Http\Validations\OrderValidator;
+use App\Repositories\OrderRepositoryInterface as OrderRepo;
 
 /**  
  *     @OA\Info(     
@@ -26,28 +24,28 @@ use GuzzleHttp\Exception\RequestException;
 class OrderController extends Controller
 {
 
+/**
+ * @var Order $order, Order Model instance
+ */
+    protected $order;
+ 
+    // inject order eloquent interface repository to controller
+    public function __construct(OrderRepo $order)
+    {
+        $this->order = $order;
+    }
+
 
 /**
  * @var int, Default Order-List Limit
  */
-    protected $defaultLimit = 3;
+    protected $defaultLimit = 4;
 
 /**
  * @var int, Default Order-List Page
  */
     protected $defaultPage = 1;
 
-
-    /**
-     * Retrieve the user for the given ID.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function showOld($id)
-    {
-        return Order::findOrFail($id);
-    }
     
      
 /**
@@ -85,7 +83,7 @@ class OrderController extends Controller
  *     ),
  * 
  *   @OA\Response(
- *     response=201,
+ *     response=200,
  *     description="successful operation",
  *     @OA\Schema(ref="#/components/schemas/Order")
  *   ),
@@ -97,12 +95,13 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+
         if(empty($request->all()))
         {
             return response()->json(['error'=>'Bad request'], 400);
         }
         
-        $resp = OrderValidation::storeRequestValidate($request);
+        $resp = OrderValidator::storeRequestValidate($request);
         if(!$resp['status']) {
             return
             response()->json(['error'=>$resp['errors']], 422);
@@ -112,25 +111,27 @@ class OrderController extends Controller
         $destination = $request->get('destination');
        
         try {
-            $distance = $this->_getMapDistance($request->get('origin'), $request->get('destination'));
+            $distance = GoogleDistanceMatrix::getMapDistance($origin, $destination);
         } catch (\Exception $ex) {
             //throw $th;
             $distance = Haversine::getDistance($origin[0], $origin[1], $destination[0], $destination[1]);
         }
-        $order = new Order;
-        $order->order_id = bin2hex(openssl_random_pseudo_bytes(10));
-        $order->origin_lat = $origin[0];
-        $order->origin_lng = $origin[1];
-        $order->destination_lat = $destination[0];
-        $order->destination_lng = $destination[1];
-        $order->distance = $distance;
-        $order->status = 'UNASSIGNED';
-        $order->created_at = date('Y-m-d H:i:s');
-        $order->updated_at = date('Y-m-d H:i:s');
-        $order->save();
 
-        $response = ['id'=>$order->id, 'distance'=>$order->distance, 'status'=>"UNASSIGNED"];
-        return response()->json($response, 201);
+        $inputs = [
+            'order_id' => bin2hex(openssl_random_pseudo_bytes(10)),
+            'origin_lat' => $origin[0],
+            'origin_lng' => $origin[1],
+            'destination_lat' => $destination[0],
+            'destination_lng' => $destination[1],
+            'distance' => $distance,
+            'status' => Order::STATUS_UNASSIGNED,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+        $order = $this->order->create($inputs);
+
+        $response = ['id'=>$order->id, 'distance'=>$order->distance, 'status'=>$order->status];
+        return response()->json($response, 200);
     }
 
 
@@ -187,15 +188,17 @@ class OrderController extends Controller
  */ 
     public function take(Request $request, $orderID)
     {
-        $validationResponse = OrderValidation::takeRequestValidate($request);
+        if(!is_numeric($orderID)) {
+            return 
+            response()->json(['error'=>'Invalid Id'], 406);
+        }
+        $validationResponse = OrderValidator::takeRequestValidate($request);
         if(!$validationResponse['status']) {
             return
             response()->json(['error'=>$validationResponse['errors']], 422);
         }
-        $order = Order::findOrFail($orderID);
-        $orderUpdate = Order::where(['id'=>$orderID, 'status'=>'UNASSIGNED'])->update(['status'=>'TAKEN', 'updated_at'=>date('Y-m-d H:i:s')]);
-        // if(!$order) return response()->json(['error'=>'Invalid Order Id'], 200);
-        $response = $orderUpdate == 1 ? ['status'=>'TAKEN'] : ['error'=>'ORDER_ALREADY_TAKEN'];
+        $orderUpdate = $this->order->take($orderID);
+        $response = $orderUpdate == 1 ? ['status'=>'SUCCESS'] : ['error'=>'ORDER ALREADY TAKEN'];
         $statusCode = $orderUpdate == 1 ? 200 : 409;        // 409 ~conflict
         return response()->json($response, $statusCode);
     }
@@ -203,12 +206,30 @@ class OrderController extends Controller
 
     
     /**
-     * @OA\Get(path="/orders",
+     * @OA\Get(path="/orders?page=:page&limit=:limit",
      *   tags={"Order List"},
      *   summary="Return Order List",
-     *   description="Returns Order id, status, disatnce List",
+     *   description="Returns Order List data have order id, status, disatnce",
      *   operationId="getOrderList",
      *   parameters={},
+     *   @OA\Parameter(
+    *       name="page",
+    *       in="path",
+    *       description="Valid Page Number",
+    *       required=true,
+    *       @OA\Schema(
+    *           type="integer",
+    *           format="int64"
+    *       ),
+    *   @OA\Parameter(
+    *       name="limit",
+    *       in="path",
+    *       description="Valid Order Limit",
+    *       required=true,
+    *       @OA\Schema(
+    *           type="integer",
+    *           format="int64"
+    *       ),
      *   @OA\Response(
      *     response=200,
      *     description="successful operation",
@@ -234,7 +255,7 @@ class OrderController extends Controller
  */ 
     public function list(Request $request)
     {
-        $validationResponse = OrderValidation::listRequestValidate($request);
+        $validationResponse = OrderValidator::listRequestValidate($request);
         if(!$validationResponse['status']) {
             return
             response()->json(['error'=>$validationResponse['errors']], 422);
@@ -243,49 +264,11 @@ class OrderController extends Controller
         $limit = $request->get('limit') ? : $this->defaultLimit;
         $page = $request->get('page') ? : $this->defaultPage;
         
-        $orders = Order::select('id', 'distance', 'status')->paginate($limit);
-        $orders->appends(['limit' => $limit, 'page'=>$page]);
-        return response()->json($orders, 200);
+        $orders = $this->order->list($page, $limit);
         // to fetch only data
         return response()->json($orders->items(), 200);
     }
 
-
-
-    private function _getMapDistance(array $origin, array $destination)
-    {
-        $url = "https://maps.googleapis.com/maps/api/distancematrix/OUTPUT_FORMAT?units=UNIT&origins=ORIGIN_VALUES&destination=DESTINATION_VALUES&key=API_KEY";
-        $origin = implode(",", $origin);
-        $destination = implode(",", $destination);
-        // $coordinates = $origin . "|" . $destination;
-        $searchKeys = ['OUTPUT_FORMAT', 'UNIT', 'ORIGIN_VALUES', 'DESTINATION_VALUES', 'API_KEY'];
-        if(env('GOOGLE_MAP_KEY') == "")
-        {
-            abort(422, 'Google Map API_KEY is not set.');
-            response()->json(['error'=>$validationResponse['errors']], 422);
-        }
-        $replacements = ['json', 'metric', $origin, $destination, env('GOOGLE_MAP_KEY')];
-        $url = str_replace($searchKeys, $replacements, $url);
-
-        try {
-            $client = new \GuzzleHttp\Client();
-            $response = $client->request('GET', $url);
-            $body = $response->getBody()->getContents();
-            $content = json_decode($body);
-            $status = $content->status;
-
-            if ( $status !== 'OK' )
-            {
-                abort(404, 'Something went wrong with Google Map API.');
-            }
-            return
-            $distance = $content['rows'][0]['elements'][0]['distance']['value'];   // in meters
-            $distance = $content['rows'][0]['elements'][0]['distance']['text'];    // in Km
-        } catch (RequestException $ex) {
-            abort(404, 'Something went wrong with Google Map API.');
-        }
-
-    }
 
 
 

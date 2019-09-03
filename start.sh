@@ -12,22 +12,24 @@ echo " $red <<<<<< Setting up Docker Environment >>>>>> $white "
 docker-compose down && docker-compose up --build -d
 
 echo " $grn <<<<<< Installing Dependencies >>>>>> $blu "
-sudo sleep 200s #this line is included for composer to finish the dependency installation so that test case can execute without error.
+#Sleep for 150seconds
+# sudo sleep 150s 
 
 vendor_present() {
-  [ -f /var/www/myorder/vendor ]
+  #[ -d /var/www/html/"${PWD##*/}"/vendor ]
+  [ -d vendor]
 }
 
-  echo "Installing/Updating Lumen dependencies (composer)"
+  echo " $red <<<<<< Installing/Updating Lumen dependencies (composer) >>>>>> $white "
   if ! vendor_present; then
     composer install
-    echo "Dependencies installed"
+    echo " $red <<<<<< Dependencies installed >>>>>> $white "
   else
     composer update
-    echo "Dependencies updated"
+    echo " $red <<<<<< Dependencies updated >>>>>> $white "
   fi
 
-docker exec ${APP_NAME}_php bash -c 'chmod 777 -R /var/www/html'
+# docker exec ${APP_NAME}_php bash -c 'chmod 777 -R /var/www/html'
 
 docker exec ${APP_NAME}_php php artisan config:cache
 
@@ -42,7 +44,16 @@ docker exec ${APP_NAME}_php php artisan db:seed
 echo " $red <<<<<< Running PHP in-built server >>>>>> $white "
 docker exec ${APP_NAME}_php php -S localhot:8080 -t public
 
-echo " $red <<<<<< Running PHPUnit Test >>>>>> $white "
+echo " $red <<<<<< Running MyOrder All Test Cases >>>>>> $white "
 docker exec ${APP_NAME}_php ./vendor/bin/phpunit
+
+echo " $red <<<<<< Running MyOrder Integration Test Cases >>>>>> $white "
+docker exec ${APP_NAME}_php ./vendor/bin/phpunit OrderIntegrationTest
+
+echo " $red <<<<<< Running MyOrder Unit Test Cases >>>>>> $white "
+docker exec ${APP_NAME}_php ./vendor/bin/phpunit OrderControllerTest
+
+echo " $red <<<<<< Wanna check Swagger Implemetatipn >>>>>> $white "
+echo "http://localhost:8080/swagger/" 
 
 exit 0
