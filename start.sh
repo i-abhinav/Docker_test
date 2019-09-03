@@ -30,6 +30,7 @@ vendor_present() {
   fi
 
 # docker exec ${APP_NAME}_php bash -c 'chmod 777 -R /var/www/html'
+docker exec ${APP_NAME}_php bash -c 'chmod 777 -R storage'
 
 docker exec ${APP_NAME}_php php artisan config:cache
 
