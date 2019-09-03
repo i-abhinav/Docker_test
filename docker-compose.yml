@@ -45,7 +45,7 @@
 
 
 
-version: "3.2"
+version: "3"
 services:
   php:
     container_name: ${APP_NAME}_php
