@@ -4,7 +4,7 @@ RUN apt-get update
 
 # 1. development packages
 RUN apt-get install -y \
-    curl \
+    curl
 
 # 2. apache configs + document root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/
@@ -21,7 +21,7 @@ RUN docker-php-ext-install \
     iconv \
     mbstring \
     pdo_mysql \
-    mysqli \
+    mysqli
 
 # 5. composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
