@@ -10,7 +10,8 @@ source .env
 
 echo " $red <<<<<< Setting up Docker Environment >>>>>> $white "
 # docker-compose down && docker-compose up --build -d
-docker-compose down && docker-compose up --build -d && docker-compose logs -f
+#docker-compose down && docker-compose up --build -d && docker-compose logs -f
+docker-compose down && docker-compose up --build -d
 
 echo " $grn <<<<<< Installing Dependencies >>>>>> $blu "
 #Sleep for 150seconds
