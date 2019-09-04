@@ -73,6 +73,8 @@ services:
       - ./run/var:/var/lib/mysql
     ports:
       - 3306:3306
+    dns_search: mysql
+    restart: always
     environment:
         MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
         MYSQL_DATABASE: ${DB_DATABASE}
@@ -86,3 +88,8 @@ services:
 networks:
   backend:
     name: backend-network
+
+    #Volumes
+volumes:
+  dbdata:
+    driver: local
