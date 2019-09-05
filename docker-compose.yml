@@ -111,20 +111,24 @@ version: '3'
 services:
   db:
     image: mysql:5.7
+    container_name: ${APP_NAME}_mysql
     environment:
         MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
         MYSQL_DATABASE: ${DB_DATABASE}
         MYSQL_USER: ${DB_USERNAME}
         MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "9906:3306"
+      - "3306:3306"
   web:
     image: php:7.2.2-apache
-    container_name: php_web
+    container_name: ${APP_NAME}_php
     depends_on:
       - db
     volumes:
       - ./:/var/www/html/
+    dns:
+            - 8.8.8.8
+            - 8.8.4.4
     ports:
       - "8080:80"
     stdin_open: true
