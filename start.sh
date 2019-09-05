@@ -47,19 +47,19 @@ php artisan db:seed
 
 echo " $red <<<<<< Running PHP in-built server >>>>>> $white "
 # docker exec ${APP_NAME}_php php -S localhot:8080 -t public
-php -S localhot:8080 -t public
+php -S localhost:8080 -t public
 
 echo " $red <<<<<< Running MyOrder All Test Cases >>>>>> $white "
-# docker exec ${APP_NAME}_php ./vendor/bin/phpunit
-./vendor/bin/phpunit
+docker exec ${APP_NAME}_php ./vendor/bin/phpunit
+# ./vendor/bin/phpunit
 
 echo " $red <<<<<< Running MyOrder Integration Test Cases >>>>>> $white "
-# docker exec ${APP_NAME}_php ./vendor/bin/phpunit OrderIntegrationTest
-./vendor/bin/phpunit OrderIntegrationTest
+docker exec ${APP_NAME}_php ./vendor/bin/phpunit OrderIntegrationTest
+# ./vendor/bin/phpunit OrderIntegrationTest
 
 echo " $red <<<<<< Running MyOrder Unit Test Cases >>>>>> $white "
-# docker exec ${APP_NAME}_php ./vendor/bin/phpunit OrderControllerTest
-./vendor/bin/phpunit OrderControllerTest
+docker exec ${APP_NAME}_php ./vendor/bin/phpunit OrderControllerTest
+# ./vendor/bin/phpunit OrderControllerTest
 
 echo " $red <<<<<< Wanna check Swagger Implemetatipn >>>>>> $white "
 echo "http://localhost:8080/swagger/" 
