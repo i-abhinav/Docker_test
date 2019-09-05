@@ -33,17 +33,14 @@ vendor_present() {
 
 # docker exec ${APP_NAME}_php bash -c 'chmod 777 -R /var/www/html'
 # docker exec ${APP_NAME}_php bash -c 'chmod 777 -R storage'
-docker exec -it myorders_app bash -c "-u devuser /bin/bash"
-
-# docker exec ${APP_NAME}_php php artisan optimize:clear
-php artisan optimize:clear
+# docker exec -it myorders_app bash -c "-u devuser /bin/bash"
 
 echo " $red <<<<<< Running Migrations & Data Seeding >>>>>> $white "
 # docker exec ${APP_NAME}_php php artisan key:generate
 # docker exec ${APP_NAME}_php php artisan migrate
 # docker exec ${APP_NAME}_php php artisan db:seed
 
-php artisan key:generate
+# php artisan key:generate
 php artisan migrate
 php artisan db:seed
 # docker exec ${APP_NAME}_php php artisan db:seed

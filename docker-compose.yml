@@ -45,51 +45,87 @@
 
 
 
-version: '3.5'
+# version: '3.5'
+
+# services:
+#   myorders_app:
+#     build:
+#       context: ./docker-assets-new/apache
+#       args:
+#         uid: ${UID}
+#     container_name: ${APP_NAME}_app
+#     environment:
+#       - APACHE_RUN_USER=#${UID}
+#       - APACHE_RUN_GROUP=#${UID}
+#     volumes:
+#       - .:/var/www/html
+#     ports:
+#       - 8080:80
+#     networks:
+#       backend:
+#         aliases:
+#           - ${APP_NAME}_app
+
+#   mysql-db:
+#     image: mysql
+#     container_name: ${APP_NAME}_mysql_db
+#     volumes:
+#       - ./run/var:/var/lib/mysql
+#     ports:
+#       - 3306:3306
+#     dns_search: mysql
+#     restart: always
+#     environment:
+#         MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#         MYSQL_DATABASE: ${DB_DATABASE}
+#         MYSQL_USER: ${DB_USERNAME}
+#         MYSQL_PASSWORD: ${DB_PASSWORD}
+#     networks:
+#       backend:
+#         aliases:
+#           - db
+
+# networks:
+#   backend:
+#     name: backend-network
+
+#     #Volumes
+# volumes:
+#   dbdata:
+#     driver: local
+
+
+
+
+
+
+
+
+
+
+
+# ./docker-compose.yml
+
+version: '3'
 
 services:
-  myorders_app:
-    build:
-      context: ./docker-assets-new/apache
-      args:
-        uid: ${UID}
-    container_name: ${APP_NAME}_app
-    environment:
-      - APACHE_RUN_USER=#${UID}
-      - APACHE_RUN_GROUP=#${UID}
-    volumes:
-      - .:/var/www/html
-    ports:
-      - 8080:80
-    networks:
-      backend:
-        aliases:
-          - ${APP_NAME}_app
-
-  mysql-db:
-    image: mysql
-    container_name: ${APP_NAME}_mysql_db
-    volumes:
-      - ./run/var:/var/lib/mysql
-    ports:
-      - 3306:3306
-    dns_search: mysql
-    restart: always
+  db:
+    image: mysql:5.7
     environment:
         MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
         MYSQL_DATABASE: ${DB_DATABASE}
         MYSQL_USER: ${DB_USERNAME}
         MYSQL_PASSWORD: ${DB_PASSWORD}
-    networks:
-      backend:
-        aliases:
-          - db
-
-networks:
-  backend:
-    name: backend-network
-
-    #Volumes
-volumes:
-  dbdata:
-    driver: local
+    ports:
+      - "9906:3306"
+  web:
+    image: php:7.2.2-apache
+    container_name: php_web
+    depends_on:
+      - db
+    volumes:
+      - ./:/var/www/html/
+    ports:
+      - "8080:80"
+    stdin_open: true
+    tty: true
