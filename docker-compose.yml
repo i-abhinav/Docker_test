@@ -174,7 +174,7 @@ services:
     #     command: install
     mysqldb:
         image: mysql
-        container_name: ${APP_NAME}_mysql
+        container_name: ${APP_NAME}_mysqldb
         restart: always
         env_file:
             - ".env"
