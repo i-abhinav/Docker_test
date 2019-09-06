@@ -37,17 +37,17 @@ vendor_present() {
 
 echo " $red <<<<<< Running Migrations & Data Seeding >>>>>> $white "
 # docker exec ${APP_NAME}_php php artisan key:generate
-# docker exec ${APP_NAME}_php php artisan migrate
+docker exec ${APP_NAME}_php php artisan migrate
 # docker exec ${APP_NAME}_php php artisan db:seed
 
 # php artisan key:generate
-php artisan migrate
-php artisan db:seed
-# docker exec ${APP_NAME}_php php artisan db:seed
+# php artisan migrate
+# php artisan db:seed
+docker exec ${APP_NAME}_php php artisan db:seed
 
 echo " $red <<<<<< Running PHP in-built server >>>>>> $white "
 # docker exec ${APP_NAME}_php php -S localhot:8080 -t public
-php -S localhost:8080 -t public
+# php -S localhost:8080 -t public
 
 echo " $red <<<<<< Running MyOrder All Test Cases >>>>>> $white "
 docker exec ${APP_NAME}_php ./vendor/bin/phpunit
@@ -63,5 +63,3 @@ docker exec ${APP_NAME}_php ./vendor/bin/phpunit OrderControllerTest
 
 echo " $red <<<<<< Wanna check Swagger Implemetatipn >>>>>> $white "
 echo "http://localhost:8080/swagger/" 
-
-exit 0
