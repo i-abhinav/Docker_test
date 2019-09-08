@@ -24,20 +24,21 @@ services:
     container_name: ${APP_NAME}_apache
   mysql:
     image: mysql:5.7
-    command: --default-authentication-plugin=mysql_native_password
+    # command: --default-authentication-plugin=mysql_native_password
     restart: always
     ports:
-      - "8989:3306"
+      - 3306:3306
     volumes:
             - data:/var/lib/mysql
             # - ./:/root
     networks:
       - backend
+    dns_search: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      MYSQL_DATABASE: "${DB_DATABASE}"
-      MYSQL_USER: "${DB_USERNAME}"
-      MYSQL_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     container_name: ${APP_NAME}_mysqldb
     expose:
       - '3306'
