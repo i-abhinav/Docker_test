@@ -46,7 +46,7 @@ docker exec ${APP_NAME}_php php artisan migrate
 docker exec ${APP_NAME}_php php artisan db:seed
 
 echo " $red <<<<<< Running PHP in-built server >>>>>> $white "
-# docker exec ${APP_NAME}_php php -S localhot:8080 -t public
+docker exec ${APP_NAME}_php php -S localhost:8080 -t public
 # php -S localhost:8080 -t public
 
 echo " $red <<<<<< Running MyOrder All Test Cases >>>>>> $white "
