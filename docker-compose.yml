@@ -40,8 +40,6 @@ services:
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     container_name: ${APP_NAME}_mysqldb
-    expose:
-      - '3306'
 networks:
   frontend:
   backend:

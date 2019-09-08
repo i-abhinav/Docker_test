@@ -24,13 +24,14 @@ vendor_present() {
 
   echo " $red <<<<<< Installing/Updating Lumen dependencies (composer) >>>>>> $white "
   if ! vendor_present; then
-    composer install
+    # composer install
     echo " $red <<<<<< Dependencies installed >>>>>> $white "
   else
-    composer update
+    # composer update
     echo " $red <<<<<< Dependencies updated >>>>>> $white "
   fi
 
+# NO NEED
 # docker exec ${APP_NAME}_php bash -c 'chmod 777 -R /var/www/html'
 # docker exec ${APP_NAME}_php bash -c 'chmod 777 -R storage'
 # docker exec -it myorders_app bash -c "-u devuser /bin/bash"
@@ -46,6 +47,7 @@ docker exec ${APP_NAME}_php php artisan migrate
 docker exec ${APP_NAME}_php php artisan db:seed
 
 echo " $red <<<<<< Running PHP in-built server >>>>>> $white "
+# NO NEED
 # docker exec ${APP_NAME}_php php -S localhost:8080 -t public
 # php -S localhost:8080 -t public
 
