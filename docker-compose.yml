@@ -27,7 +27,8 @@ services:
     # command: --default-authentication-plugin=mysql_native_password
     restart: always
     ports:
-      - "8989:3306"
+      - 3306:3306
+    dns_search: mysql
     volumes:
             - data:/var/lib/mysql
             # - ./:/root
