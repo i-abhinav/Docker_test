@@ -24,6 +24,7 @@ services:
     container_name: ${APP_NAME}_apache
   mysql:
     image: mysql
+    command: --default-authentication-plugin=mysql_native_password
     restart: always
     ports:
       - "8989:3306"
