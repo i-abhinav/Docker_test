@@ -33,7 +33,6 @@ services:
             # - ./:/root
     networks:
       - backend
-    dns_search: mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
