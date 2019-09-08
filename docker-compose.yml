@@ -1,16 +1,16 @@
 version: "3.2"
 services:
-  php:
-    build: 
-      context: './docker-assets-new/php/'
-    networks:
-      - backend
-    volumes:
-      - ./:/var/www/html/
-    container_name: ${APP_NAME}_php
+  	php:
+		build: 
+		context: './docker-assets-new/php/'
+		networks:
+		- backend
+		volumes:
+		- ./:/var/www/html/
+		container_name: ${APP_NAME}_php
   	apache:
     	build:
-      	context: './docker-assets/apache/'
+      		context: './docker-assets/apache/'
     	depends_on:
       		- php
       		- mysql
@@ -21,7 +21,7 @@ services:
       		- "8080:80"
     	volumes:
       		- ./:/var/www/html/
-    	container_name: apache
+    	container_name: ${APP_NAME}_apache
 	mysql:
         image: mysql
         container_name: ${APP_NAME}_mysqldb
@@ -36,8 +36,8 @@ services:
         ports:
             - "8989:3306"
         volumes:
-			- "./data/db/mysql:/var/lib/mysql"
-			- - ./:/root
+          - "./data/db/mysql:/var/lib/mysql"
+          - ./:/root
 networks:
   frontend:
   backend:
