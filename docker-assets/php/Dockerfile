@@ -1,36 +1,20 @@
 FROM php:7.3-fpm-alpine
-RUN apk add --no-cache \
-        zip \
-        libzip-dev \
-        libpng \
-        libpng-dev \
-        libjpeg \
-        icu \
-        icu-dev \
-        libxml2 \
-        libxml2-dev \
-        git \
-        openssl \
-        openssl-dev 
-RUN docker-php-ext-install \
-        pdo_mysql \
-        mysqli \
-        gd \
-        mbstring \
-        intl \
-        xml \
-        opcache \
-		pcntl \
-		bcmath \
-        zip 
-RUN curl -sS https://getcomposer.org/installer | php ;mv composer.phar /usr/local/bin/composer;
-# RUN composer global require laravel/installer
+RUN apk update; \
+    apk upgrade;
+RUN docker-php-ext-install iconv pdo pdo_mysql mysqli
 
-ENV PATH="/root/.composer/vendor/bin:${PATH}"
+#Install Composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+RUN php composer-setup.php --install-dir=. --filename=composer
+RUN mv composer /usr/local/bin/
 
-# RUN composer global require hirak/prestissimo
-# RUN composer global require phpunit/phpunit
 
-# RUN apk add --update nodejs 
-# RUN apk add --update npm 
-# RUN apk add yarn
+
+# Bundle app source 
+# COPY src/ /var/www/html/
+
+# Install app dependencies
+# RUN cd /src && \
+#     composer install --no-interaction 
+
+# EXPOSE 80

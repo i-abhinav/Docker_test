@@ -1,6 +1,4 @@
-/vendor
-/.idea
+/src/vendor
+/src/.idea
 Homestead.json
 Homestead.yaml
-run/var
-

@@ -3,65 +3,40 @@
 
 red=$'\e[1;31m'
 green=$'\e[1;32m'
-blue=$'\e[1;34m'
 white=$'\e[0m'
 
-source .env
+source ./src/.env
 
 echo " $red <<<<<< Setting up Docker Environment >>>>>> $white "
-# docker-compose down && docker-compose up --build -d
-#docker-compose down && docker-compose up --build -d && docker-compose logs -f
 docker-compose down && docker-compose up --build -d
 
 echo " $grn <<<<<< Installing Dependencies >>>>>> $blu "
-#Sleep for 150seconds
+#sleep for 150 seconds 
 # sudo sleep 150s 
 
 vendor_present() {
-  #[ -d /var/www/html/"${PWD##*/}"/vendor ]
-   [ -d vendor ]
+  [ -d /var/www/html/vendor ]
 }
 
-  echo " $red <<<<<< Installing/Updating Lumen dependencies (composer) >>>>>> $white "
+  echo "Installing/Updating Lumen dependencies (composer)"
   if ! vendor_present; then
     # composer install
-    echo " $red <<<<<< Dependencies installed >>>>>> $white "
+    docker exec ${APP_NAME}_php composer install --no-progress --quiet
+    echo "Dependencies installed"
   else
     # composer update
-    echo " $red <<<<<< Dependencies updated >>>>>> $white "
+    docker exec ${APP_NAME}_php composer update --no-progress --quiet
+    echo "Dependencies updated"
   fi
 
-# NO NEED
-# docker exec ${APP_NAME}_php bash -c 'chmod 777 -R /var/www/html'
-# docker exec ${APP_NAME}_php bash -c 'chmod 777 -R storage'
-# docker exec -it myorders_app bash -c "-u devuser /bin/bash"
-
 echo " $red <<<<<< Running Migrations & Data Seeding >>>>>> $white "
-# docker exec ${APP_NAME}_php php artisan key:generate
 docker exec ${APP_NAME}_php php artisan migrate
+docker exec ${APP_NAME}_php php artisan db:seed
 # docker exec ${APP_NAME}_php php artisan db:seed
 
-# php artisan key:generate
-# php artisan migrate
-# php artisan db:seed
-docker exec ${APP_NAME}_php php artisan db:seed
-
 echo " $red <<<<<< Running PHP in-built server >>>>>> $white "
-# NO NEED
 # docker exec ${APP_NAME}_php php -S localhost:8080 -t public
-# php -S localhost:8080 -t public
 
-echo " $red <<<<<< Running MyOrder All Test Cases >>>>>> $white "
+echo " $red <<<<<< Running PHPUnit Test >>>>>> $white "
 docker exec ${APP_NAME}_php ./vendor/bin/phpunit
-# ./vendor/bin/phpunit
 
-echo " $red <<<<<< Running MyOrder Integration Test Cases >>>>>> $white "
-docker exec ${APP_NAME}_php ./vendor/bin/phpunit OrderIntegrationTest
-# ./vendor/bin/phpunit OrderIntegrationTest
-
-echo " $red <<<<<< Running MyOrder Unit Test Cases >>>>>> $white "
-docker exec ${APP_NAME}_php ./vendor/bin/phpunit OrderControllerTest
-# ./vendor/bin/phpunit OrderControllerTest
-
-echo " $red <<<<<< Wanna check Swagger Implemetatipn >>>>>> $white "
-echo "http://localhost:8080/swagger/" 
