@@ -21,21 +21,17 @@ vendor_present() {
   echo "Installing/Updating Lumen dependencies (composer)"
   if ! vendor_present; then
     # composer install
-    docker exec ${APP_NAME}_php composer install --no-progress --quiet
+    docker exec ${APP_NAME}_php composer install
     echo "Dependencies installed"
   else
     # composer update
-    docker exec ${APP_NAME}_php composer update --no-progress --quiet
+    docker exec ${APP_NAME}_php composer update
     echo "Dependencies updated"
   fi
 
 echo " $red <<<<<< Running Migrations & Data Seeding >>>>>> $white "
 docker exec ${APP_NAME}_php php artisan migrate
 docker exec ${APP_NAME}_php php artisan db:seed
-# docker exec ${APP_NAME}_php php artisan db:seed
-
-echo " $red <<<<<< Running PHP in-built server >>>>>> $white "
-# docker exec ${APP_NAME}_php php -S localhost:8080 -t public
 
 echo " $red <<<<<< Running PHPUnit Test >>>>>> $white "
 docker exec ${APP_NAME}_php ./vendor/bin/phpunit
