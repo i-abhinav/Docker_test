@@ -37,7 +37,7 @@ services:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-    container_name: ${APP_NAME}_mysql
+    container_name: ${APP_NAME}_mysqldb
 networks:
   frontend:
   backend:

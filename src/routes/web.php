@@ -11,10 +11,6 @@
 |
 */
 
-
-// Order List API
-$router->get('orders', 'OrderController@list');
-// Order Create
-$router->post('orders', 'OrderController@store');
-// Order Update
-$router->patch('orders/{orderID}', 'OrderController@take');
+$router->get('/', function () use ($router) {
+    return $router->app->version();
+});

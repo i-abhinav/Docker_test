@@ -57,51 +57,9 @@ class Handler extends ExceptionHandler
         if ($exception instanceof \Illuminate\Http\Exception\MethodNotAllowedHttpException) {
             return response()->json(['error' => $exception->getMessage()], 500);
         }
-        if ($exception instanceof \App\Exceptions\GoogleMapAPIException) {
-            return response()->json(['error' => $exception->getMessage()], 503);
-        }
-        if ($exception) {
-            return $this->_customApiResponse($exception);
-        }
         return parent::render($request, $exception);
 
     }
 
-    private function _customApiResponse($exception)
-    {
-        if (method_exists($exception, 'getStatusCode')) {
-            $statusCode = $exception->getStatusCode();
-        } else {
-            $statusCode = 500;
-        }
-
-        $response = [];
-
-        switch ($statusCode) {
-            case 401:
-                $response['error'] = 'UNAUTHORIZED';
-                break;
-            case 403:
-                $response['error'] = 'FORBIDDEN';
-                break;
-            case 404:
-                $response['error'] = 'NOT_FOUND';
-                break;
-            case 405:
-                $response['error'] = 'METHOD_NOT_ALLOWED';
-                break;
-            case 422:
-                $response['error'] = $exception->original['message'];
-                $response['errors'] = $exception->original['errors'];
-                break;
-            case 301:
-                $response['error'] = "INVALID_API_REUQUEST";
-            default:
-                $response['error'] = ($statusCode == 500) ? 'SOMETHING_WENT_WRONG' : $exception->getMessage();
-                break;
-        }
-
-        return response()->json($response, $statusCode);
-    }
 
 }

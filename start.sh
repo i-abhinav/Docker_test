@@ -10,10 +10,6 @@ source ./src/.env
 echo " $red <<<<<< Setting up Docker Environment >>>>>> $white "
 docker-compose down && docker-compose up --build -d
 
-echo " $grn <<<<<< Installing Dependencies >>>>>> $blu "
-#sleep for 150 seconds 
-# sudo sleep 150s 
-
 vendor_present() {
   [ -d /var/www/html/vendor ]
 }
@@ -29,10 +25,4 @@ vendor_present() {
     echo "Dependencies updated"
   fi
 
-echo " $red <<<<<< Running Migrations & Data Seeding >>>>>> $white "
-docker exec ${APP_NAME}_php php artisan migrate
-docker exec ${APP_NAME}_php php artisan db:seed
-
-echo " $red <<<<<< Running PHPUnit Test >>>>>> $white "
-docker exec ${APP_NAME}_php ./vendor/bin/phpunit
 
